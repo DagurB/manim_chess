@@ -76,7 +76,7 @@ class Board(Mobject):
 		Returns the piece at a given coordinate, if any.
 	"""
 
-	def __init__(self, color_dark='#769656', color_light='#eeeed2', color_highlight_light='#F7F769', color_highlight_dark='#BBCB2B') -> None:
+	def __init__(self, color_dark: str = '#769656', color_light: str = '#eeeed2', color_highlight_light: str = '#F7F769', color_highlight_dark: str = '#BBCB2B', size_of_board: int = 8, cell_size: float = 0.8) -> None:
 		"""
 		Initializes the Board object.
 		"""
@@ -85,8 +85,8 @@ class Board(Mobject):
 		self.color_light = ManimColor(color_light)
 		self.color_highlight_light = ManimColor(color_highlight_light)
 		self.color_highlight_dark = ManimColor(color_highlight_dark)
-		self.size_of_board = 8
-		self.cell_size = 0.8  # Size of each square in the board
+		self.size_of_board = size_of_board
+		self.cell_size = cell_size  # Size of each square in the board
 		self.squares = {}  # squares[coordinate] = square
 		self.create_board()
 		self.pieces = {}  # pieces[coordinate] = piece
@@ -251,7 +251,7 @@ class Board(Mobject):
 			6: 'g',
 			7: 'h'
 		}
-		coordinate = f'{number_to_letter[index % 8]}{8 - math.floor(index / 8)}'
+		coordinate = f'{number_to_letter[index % self.size_of_board]}{self.size_of_board - index // self.size_of_board}'
 		return coordinate
 
 	def set_board_from_FEN(self, FEN: str="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") -> None:
@@ -268,6 +268,8 @@ class Board(Mobject):
 		for char in piece_info:
 			if char in {'1', '2', '3', '4', '5', '6', '7', '8'}:
 				current_index += int(char)
+			elif char == '.':
+				current_index += 1
 			elif char == '/':
 				pass
 			else:
@@ -282,7 +284,7 @@ class Board(Mobject):
 		for coordinate in self.pieces:
 			self.remove(self.pieces[coordinate])
 		self.pieces = {}
-		self.clear_higlights()
+		self.clear_highlights()
 
 	def is_light_square(self, coordinate: str) -> bool:
 		"""
@@ -481,7 +483,7 @@ class Board(Mobject):
 		for arrow in self.arrows:
 			self.remove(arrow)
 
-	def clear_higlights(self):
+	def clear_highlights(self):
 		"""
 		Removes all highlights from the board.
 		"""
@@ -506,7 +508,7 @@ class Board(Mobject):
 			self.pieces[ending_coordinate] = piece_to_move
 			del self.pieces[starting_coordinate]
 
-			self.clear_higlights()
+			self.clear_highlights()
 			self.highlighted_squares = []
 
 			piece_to_move.move_to(self.squares[ending_coordinate].get_center())
